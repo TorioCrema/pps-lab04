@@ -1,6 +1,9 @@
 package it.unibo.pps.tasks.adts
 
 import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
+import it.unibo.pps.u04.adts.SetADT.Set
+import it.unibo.pps.u04.adts.SetADT.fromSequence
+import it.unibo.pps.u04.moduletypes.Sets.*
 
 /*  Exercise 2: 
  *  Implement the below trait, and write a meaningful test.
@@ -16,7 +19,7 @@ object SchoolModel:
     type Course
 
     /**
-     * This a factory method for create a teacher from a name
+     * This a factory method to create a teacher from a name
      * e.g.,
      * teacher("John") // => Teacher("John")
      * Note!! The internal representation of a teacher may vary, decide what is the best for you
@@ -24,6 +27,7 @@ object SchoolModel:
      * @return the teacher created
      */
     def teacher(name: String): Teacher
+
     /**
      * This a factory method for create a course from a name
      * e.g.,
@@ -111,22 +115,36 @@ object SchoolModel:
        *
        */
       def hasCourse(name: String): Boolean
-  object BasicSchoolModule extends SchoolModule:
-    override type School = Nothing
-    override type Teacher = Nothing
-    override type Course = Nothing
 
-    def teacher(name: String): Teacher = ???
-    def course(name: String): Course = ???
-    def emptySchool: School = ???
+  object BasicSchoolModule extends SchoolModule:
+
+    override type School = Sequence[(teacher: Teacher, courses: Set[Course])]
+    override type Teacher = String
+    override type Course = String
+
+    def teacher(name: String): Teacher = name
+    def course(name: String): Course = name
+    def emptySchool: School = Sequence.Nil()
 
     extension (school: School)
-      def courses: Sequence[String] = ???
-      def teachers: Sequence[String] = ???
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
-      def hasTeacher(name: String): Boolean = ???
-      def hasCourse(name: String): Boolean = ???
+      def courses: Sequence[String] = school match
+        case Cons((teacher, c), t) => c.toSequence().concat(t.courses).distinct()
+        case _ => Nil()
+      def teachers: Sequence[String] = school.map(x => x.teacher)
+      def setTeacherToCourse(teacher: Teacher, course: Course): School = school match
+        case Cons((teach, c), t) => if teach == teacher
+          then Cons((teach, c.add(course)), t)
+          else Cons((teach, c), t.setTeacherToCourse(teacher, course))
+        case _ => Cons((teacher, fromSequence(Cons(course, Nil()))), Nil())
+      @annotation.tailrec
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = school match
+        case Cons((teach, c), t) => if teach == teacher
+          then c.toSequence()
+          else t.coursesOfATeacher(teacher)
+        case _ => Nil()
+      def hasTeacher(name: String): Boolean = fromSequence(school.teachers).contains(name)
+      def hasCourse(name: String): Boolean = fromSequence(school.courses).contains(name)
+
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
   val school = emptySchool

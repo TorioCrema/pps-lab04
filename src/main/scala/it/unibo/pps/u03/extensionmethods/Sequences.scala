@@ -24,6 +24,18 @@ object Sequences:
         case Cons(_, t)            => t.filter(pred)
         case Nil()                 => Nil()
 
+      def concat(s: Sequence[A]): Sequence[A] = l match
+        case Cons(h, t) => Cons(h, t.concat(s))
+        case _ => s
+
+      def concat(elem: A): Sequence[A] = l match
+        case Cons(h, t) => Cons(h, t.concat(elem))
+        case _ => Cons(elem, Nil())
+
+      def distinct(): Sequence[A] = l match
+        case Cons(h, t) => Cons(h, t.filter(_ != h).distinct())
+        case _ => Nil()
+
     def of[A](n: Int, a: A): Sequence[A] =
       if (n == 0) then Nil[A]() else Cons(a, of(n - 1, a))
 

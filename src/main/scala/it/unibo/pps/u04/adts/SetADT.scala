@@ -25,6 +25,7 @@ object SetADT:
       case Nil()                => false
     def remove(a: A): Set[A] = s.filter(_ != a)  
     def toSequence(): Sequence[A] = s
+    def add(a: A): Set[A] = union(s, Cons(a, Nil()))
 
 @main def trySetADT =
   import SetADT.*

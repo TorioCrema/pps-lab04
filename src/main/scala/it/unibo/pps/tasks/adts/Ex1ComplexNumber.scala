@@ -30,5 +30,6 @@ object Ex1ComplexNumbers:
       def asString(): String = complex match
         case (re, 0) => re.toString
         case (0, im) => im.toString + "i"
-        case (re, im) if im < 0 => re.toString + " - " + (-im).toString + "i"
-        case (re, im) => re.toString + " + " + im.toString + "i"
+        case (re, im) => if im < 0
+          then re.toString + " - " + (-im).toString + "i"
+          else re.toString + " + " + im.toString + "i"
