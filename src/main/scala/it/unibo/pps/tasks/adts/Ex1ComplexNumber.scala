@@ -23,8 +23,8 @@ object Ex1ComplexNumbers:
     type Complex = (Double, Double)
     def complex(re: Double, im: Double): Complex = (re, im)
     extension (complex: Complex)
-      def re(): Double = complex._1
-      def im(): Double = complex._2
+      def re(): Double = complex match { case (re, _) => re }
+      def im(): Double = complex match { case (_, im) => im}
       def sum(other: Complex): Complex = (complex.re() + other.re(), complex.im() + other.im())
       def subtract(other: Complex): Complex = (complex.re() - other.re(), complex.im() - other.im())
       def asString(): String = complex match
